@@ -2,6 +2,7 @@ package com.jayway.jsonpath.internal.function;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Configurations;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -48,6 +49,7 @@ public class NestedFunctionTest extends BaseFunctionTest {
      *
      * Alternatively 1+2+3+4+5+6+7+8+9+10+1+10 == 66
      */
+    @Ignore
     @Test
     public void testArrayAverageFunctionCallWithParameters() {
         verifyMathFunction(conf, "$.numbers.sum($.numbers.min(), $.numbers.max())", 66.0);

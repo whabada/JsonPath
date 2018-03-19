@@ -36,6 +36,15 @@ public abstract class PathToken {
         return next;
     }
 
+    PathToken remove() {
+        prev.next = next;
+        if (next == null) {
+            return prev;
+        }
+        next.prev = prev;
+        return next;
+    }
+
     void handleObjectProperty(String currentPath, Object model, EvaluationContextImpl ctx, List<String> properties) {
 
         if(properties.size() == 1) {
@@ -54,7 +63,7 @@ public abstract class PathToken {
                         propertyVal =  null;
                     } else {
                         if(ctx.options().contains(Option.SUPPRESS_EXCEPTIONS) ||
-                           !ctx.options().contains(Option.REQUIRE_PROPERTIES)){
+                                !ctx.options().contains(Option.REQUIRE_PROPERTIES)){
                             return;
                         } else {
                             throw new PathNotFoundException("No results for path: " + evalPath);
@@ -62,8 +71,8 @@ public abstract class PathToken {
                     }
                 } else {
                     if (! (isUpstreamDefinite() && isTokenDefinite()) &&
-                       !ctx.options().contains(Option.REQUIRE_PROPERTIES) ||
-                       ctx.options().contains(Option.SUPPRESS_EXCEPTIONS)){
+                            !ctx.options().contains(Option.REQUIRE_PROPERTIES) ||
+                            ctx.options().contains(Option.SUPPRESS_EXCEPTIONS)){
                         // If there is some indefiniteness in the path and properties are not required - we'll ignore
                         // absent property. And also in case of exception suppression - so that other path evaluation
                         // branches could be examined.
@@ -125,9 +134,8 @@ public abstract class PathToken {
     protected void handleArrayIndex(int index, String currentPath, Object model, EvaluationContextImpl ctx) {
         String evalPath = Utils.concat(currentPath, "[", String.valueOf(index), "]");
         PathRef pathRef = ctx.forUpdate() ? PathRef.create(model, index) : PathRef.NO_OP;
-        int effectiveIndex = index < 0 ? ctx.jsonProvider().length(model) + index : index;
         try {
-            Object evalHit = ctx.jsonProvider().getArrayIndex(model, effectiveIndex);
+            Object evalHit = ctx.jsonProvider().getArrayIndex(model, index);
             if (isLeaf()) {
                 ctx.addResult(evalPath, pathRef, evalHit);
             } else {
@@ -215,7 +223,4 @@ public abstract class PathToken {
 
     protected abstract String getPathFragment();
 
-    public void setNext(final PathToken next) {
-        this.next = next;
-    }
 }

@@ -45,13 +45,14 @@ public class EvaluationContextImpl implements EvaluationContext {
     private final Object pathResult;
     private final Path path;
     private final Object rootDocument;
+    private final Object paramsRootDocument;
     private final List<PathRef> updateOperations;
     private final HashMap<Path, Object> documentEvalCache = new HashMap<Path, Object>();
     private final boolean forUpdate;
     private int resultIndex = 0;
 
 
-    public EvaluationContextImpl(Path path, Object rootDocument, Configuration configuration, boolean forUpdate) {
+    public EvaluationContextImpl(Path path, Object rootDocument, Configuration configuration, boolean forUpdate, Object paramsRootDocument) {
         notNull(path, "path can not be null");
         notNull(rootDocument, "root can not be null");
         notNull(configuration, "configuration can not be null");
@@ -62,6 +63,7 @@ public class EvaluationContextImpl implements EvaluationContext {
         this.valueResult = configuration.jsonProvider().createArray();
         this.pathResult = configuration.jsonProvider().createArray();
         this.updateOperations = new ArrayList<PathRef>();
+        this.paramsRootDocument = paramsRootDocument;
     }
 
     public HashMap<Path, Object> documentEvalCache() {
@@ -111,6 +113,10 @@ public class EvaluationContextImpl implements EvaluationContext {
         return rootDocument;
     }
 
+    public Object paramsRootDocument() {
+        return paramsRootDocument;
+    }
+
     public Collection<PathRef> updateOperations(){
 
         Collections.sort(updateOperations);
@@ -135,7 +141,7 @@ public class EvaluationContextImpl implements EvaluationContext {
             int len = jsonProvider().length(valueResult);
             Object value = (len > 0) ? jsonProvider().getArrayIndex(valueResult, len-1) : null;
             if (value != null && unwrap){
-              value = jsonProvider().unwrap(value);
+                value = jsonProvider().unwrap(value);
             }
             return (T) value;
         }
@@ -163,7 +169,7 @@ public class EvaluationContextImpl implements EvaluationContext {
         return res;
     }
 
-    private static class FoundResultImpl implements EvaluationListener.FoundResult {
+    private class FoundResultImpl implements EvaluationListener.FoundResult {
 
         private final int index;
         private final String path;
